@@ -64,4 +64,28 @@
 
 ---
 
+## 2026-07-22 — Phase 2 payment gateway interface + stub
+
+**What AI helped with:**
+- Drafted `PaymentGateway` type (both methods returning `Result<T, PaymentError>`), `StubPaymentGateway` with scriptable FIFO queues, and `DemoPaymentGateway` (token-driven decline).
+- 10 Jest tests covering FIFO order, empty-queue throw, and queue independence.
+
+**How it was validated:**
+- Typecheck + tests green (58 total).
+- Named the method `voidPayment` (not `void`) after realizing `void` is a TS keyword — cleaner reads at every call site.
+
+## 2026-07-22 — Phase 3 repository + service + 4 required scenarios
+
+**What AI helped with:**
+- Wrote `InMemoryOrderRepository` (globalThis-attached Map, optional constructor-injected Map for test isolation) + `OrderService` orchestrator.
+- The single write path (`commit()`) enforces `applyTransition` before every repo write — no bypass.
+- 11 `describe` blocks covering the 4 required scenarios + manual resolve + illegal-move throws + reads.
+
+**How it was validated:**
+- Fixed 2 typecheck errors surfaced by strict TS:
+  - `PaymentError` was imported from `paymentGateway.ts` where it isn't declared — moved import to `types.ts`.
+  - Typo: `paymentIntentId?: OrderId | null` in the commit helper's `extra` param — should have been `PaymentIntentId`. Branded types caught this at compile time; without the brand it would have failed silently at runtime.
+- 1 test failure (list sort race — two orders created in the same millisecond). Fixed by switching `list()` from `createdAt` sort to reverse-Map-iteration (insertion order is spec-guaranteed). Documented in the file.
+- 69/69 tests green. Typecheck clean.
+
 <!-- Add one entry per meaningful AI-assisted step from here on. -->
