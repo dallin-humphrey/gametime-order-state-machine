@@ -32,13 +32,35 @@
 - Wrote `package.json`, `tsconfig.json` (with `strict` + `noUncheckedIndexedAccess`), Tailwind v4 + PostCSS config, Jest config, ESLint config, and a placeholder `layout.tsx` + `page.tsx`.
 
 **How it was validated:**
-- Ran `npm install` — succeeded / see notes.
-- Ran `npm run build` — verified compile.
-- Ran `npm run typecheck` — verified strict TS.
-- Ran `npm test` — verified Jest wiring (no tests yet, exits clean).
+- `npm install` succeeded. Hit a `ts-jest` peer conflict against TypeScript 7 (latest) — pinned TS to `^6` (still modern, satisfies ts-jest's `<7` peer).
+- `npm run build` compiled cleanly.
+- `npm run typecheck` clean.
+- `npm test` exited 0 with no tests (via `passWithNoTests`).
 
 **What was kept vs changed:**
-- (to be filled in after Phase 0 verification)
+- Kept the strict + `noUncheckedIndexedAccess` tsconfig.
+- Changed TypeScript version from `latest` (7.x) to `^6` after peer conflict.
+- Fixed a Turbopack workspace-root warning by pinning `turbopack.root` in `next.config.mjs`.
+
+## 2026-07-22 — Phase 1 domain types + state machine
+
+**What AI helped with:**
+- Wrote `src/server/domain/types.ts` (branded IDs via `z.brand<"Tag">()`, `OrderState` union, `AdvanceEvent` discriminated union, `Result<T, E>`, `PaymentError`, `assertNever`).
+- Wrote `src/server/domain/orderState.ts` (transition matrix as `as const satisfies Record<OrderState, readonly OrderState[]>`, `applyTransition`, `nextStates`, `isTerminal`).
+- Wrote per-file docs (`typesDoc.md`, `orderStateDoc.md`, `tests/testsDoc.md`) explaining every non-obvious decision in plain English.
+- Wrote `tests/orderState.test.ts` — 48 tests covering matrix invariants, happy path, all failure-path transitions, illegal moves per source state, `it.each` sweeps of terminal states, and Zod branded schema parsing.
+
+**How it was validated:**
+- `npm run typecheck` — clean.
+- `npm test` — 48/48 pass.
+- Two errors surfaced and were fixed:
+  1. Tests couldn't find `it`/`expect` globals. Fix: import from `@jest/globals` (more explicit than relying on ambient `@types/jest`).
+  2. `ts-jest` complained about `rootDir`. Fix: added `"rootDir": "."` to `tsconfig.json`.
+
+**What was kept vs changed:**
+- Kept branded-IDs + Zod as source of truth (matches ADR 0003).
+- Kept `as const satisfies` matrix pattern (matches ADR 0002).
+- Simplified `TransitionError` from a two-variant union (`"invalid_transition" | "terminal_state"`) to a single `"invalid_transition"` — terminal is just the empty-successors case, no need to distinguish. Cleaner.
 
 ---
 
