@@ -34,8 +34,41 @@ import {
   type PaymentError,
   type PaymentIntentId,
   type Result,
+  type TransitionError,
 } from "./types";
 import { applyTransition } from "./orderState";
+
+/**
+ * Thrown when advance is called on an id that isn't in the repository.
+ * Route handlers translate this into HTTP 404. Named class (not a generic
+ * `Error`) so `error instanceof OrderNotFoundError` beats string-matching
+ * on `.message`.
+ */
+export class OrderNotFoundError extends Error {
+  constructor(public readonly orderId: OrderId) {
+    super(`OrderService: order ${orderId} not found`);
+    this.name = "OrderNotFoundError";
+  }
+}
+
+/**
+ * Thrown when the pure state machine refuses the requested transition.
+ * Route handlers translate this into HTTP 409 (client sent an operation
+ * that's inconsistent with the current state, e.g. authorizing an already
+ * rejected order).
+ */
+export class IllegalTransitionError extends Error {
+  constructor(
+    public readonly from: OrderState,
+    public readonly to: OrderState,
+    public readonly reason: TransitionError,
+  ) {
+    super(
+      `OrderService: illegal transition ${from} → ${to} (${reason})`,
+    );
+    this.name = "IllegalTransitionError";
+  }
+}
 
 /**
  * The shape callers pass to `advance`.
@@ -79,7 +112,7 @@ export class OrderService {
   async advance(input: AdvanceInput): Promise<Order> {
     const order = this.repo.get(input.orderId);
     if (!order) {
-      throw new Error(`OrderService.advance: order ${input.orderId} not found`);
+      throw new OrderNotFoundError(input.orderId);
     }
 
     switch (input.event.type) {
@@ -219,9 +252,7 @@ export class OrderService {
   ): Order {
     const transition = applyTransition(order.state, to);
     if (!transition.ok) {
-      throw new Error(
-        `OrderService: illegal transition ${order.state} → ${to} (${transition.error})`,
-      );
+      throw new IllegalTransitionError(order.state, to, transition.error);
     }
     return this.repo.update(order.id, {
       state: to,
