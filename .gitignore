@@ -1,0 +1,44 @@
+# deps
+node_modules/
+.pnp
+.pnp.js
+
+# next
+.next/
+out/
+build/
+dist/
+
+# env
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# testing
+coverage/
+.nyc_output/
+
+# misc
+.DS_Store
+Thumbs.db
+*.pem
+.vscode/
+.idea/
+
+# ts
+*.tsbuildinfo
+next-env.d.ts
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# vercel
+.vercel
+
+# local ai / claude
+.claude/
