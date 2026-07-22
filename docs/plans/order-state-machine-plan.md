@@ -1,7 +1,8 @@
 # Order State Machine — Gametime Take-Home Plan
 
-> **Status:** Planning (awaiting approval)
+> **Status:** SCOPE LOCKED — building Option B (see §0 below).
 > **Date opened:** 2026-07-22
+> **Scope locked:** 2026-07-22
 > **Submission deadline:** ~2026-08-01 (10 days from receipt)
 > **Submit to:** `https://app8.greenhouse.io/tests/ff7575d6176c01b3af3daa837bcf6753`
 > **Assessment PDF:** `C:\Users\dalli\Downloads\Gametime.pdf`
@@ -13,6 +14,40 @@
 > - `README.md`
 >
 > **Purpose:** Lock the full design of the take-home before writing any implementation code. This is the artifact Dallin will re-read the morning of the panel to defend every decision. If a decision changes mid-build, update this file first, then the code.
+
+---
+
+## 0. Scope Lock — Option B (supersedes anything below that conflicts)
+
+After weighing the assessment's "don't over-engineer" line against panel comfort, we picked the **middle option**. What's in and out:
+
+**In:**
+- Next.js 15 App Router + TS strict + Tailwind + Zod + Jest
+- **In-memory storage** via a Repository class holding a `Map<OrderId, Order>` on `globalThis` (survives HMR + warm serverless)
+- **Next.js Route Handlers** at `/api/orders/*` — no tRPC
+- Small 2-page UI (orders list + order detail with advance controls) so the interviewer can click through
+- Per-file `NameDoc.md` docs, master feature doc, ADRs
+- Deploy to Vercel
+- Repo: `github.com/dallin-humphrey/gametime-order-state-machine`
+- Brand color: primary `#00D67C` (Gametime-inspired electric green — swap the exact hex in Tailwind config if we get it)
+
+**Out (was in the original Option C plan):**
+- NeonDB / Drizzle / drizzle-kit
+- tRPC / React Query
+- Cypress (Jest covers unit; manual click-through covers UI)
+- Repository interface abstraction (in-memory only, wrapped in a class)
+- Test-branch DB setup
+
+**Rewritten sections for Option B:**
+- §3 Tech Stack — remove Drizzle/Neon/tRPC/Cypress
+- §6 File Structure — remove `src/server/db/`, `src/trpc/`, `cypress/`, `drizzle/`
+- §7 Database Design — **N/A**, replaced by an in-memory repository class documented in `inMemoryOrderRepositoryDoc.md`
+- §9 API Design — same 4 endpoints, exposed as Route Handlers (POST `/api/orders`, POST `/api/orders/[id]/advance`, GET `/api/orders/[id]`, GET `/api/orders`) with Zod-parsed bodies/params
+- §15 Implementation Phases — collapsed to Phase 0-6 (see task list)
+
+Everything else (§4 Domain Model, §5 Architecture layers, §8 State Machine Design, §10 UI Design, §11 TypeScript Best Practices, §12 Documentation Standard, §13 Testing Strategy, §14 AI Usage Log, §17 Open Questions resolved, §18 Non-goals) is unchanged and applies as written.
+
+The verbose Option C content below is retained deliberately — it captures the "how would we extend this to production" thinking, which is the material for panel round 2 (Architecture). Do not delete.
 
 ---
 
