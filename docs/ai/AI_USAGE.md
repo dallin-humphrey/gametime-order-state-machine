@@ -88,4 +88,26 @@
 - 1 test failure (list sort race — two orders created in the same millisecond). Fixed by switching `list()` from `createdAt` sort to reverse-Map-iteration (insertion order is spec-guaranteed). Documented in the file.
 - 69/69 tests green. Typecheck clean.
 
+## 2026-07-22 — Phase 4 route handlers
+
+**What AI helped with:**
+- Wrote all three route files (`/api/orders`, `/api/orders/[orderId]`, `/api/orders/[orderId]/advance`) with Zod-parsed bodies + branded id validation at the boundary.
+- Refactored `OrderService` to throw named error classes (`OrderNotFoundError`, `IllegalTransitionError`) so the advance route can `instanceof`-map to precise HTTP status codes without string-matching on `.message`.
+- Added `serviceInstance.ts` globalThis singleton so route handlers + RSC pages share one `OrderService`.
+
+**How it was validated:**
+- Typecheck + 69 tests + `next build` all green. Build showed all 3 API routes registered as expected (`ƒ` — dynamic).
+
+## 2026-07-22 — Phase 5 UI
+
+**What AI helped with:**
+- Wrote list + detail pages as RSCs (reading the service singleton directly, no fetch waterfall).
+- Two client components: `NewOrderButton`, `AdvanceControls`.
+- `StateBadge` with `Record<OrderState, string>` typing so adding a new state fails to compile without a color + label.
+- Simulation buttons surfaced with explicit labels (`Simulate: completion + void fail`).
+
+**How it was validated:**
+- Typecheck + 69 tests + `next build` all green. All 6 routes registered.
+- Manual click-through (below).
+
 <!-- Add one entry per meaningful AI-assisted step from here on. -->
