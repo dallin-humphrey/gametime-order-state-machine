@@ -42,3 +42,9 @@ yarn-error.log*
 
 # local ai / claude
 .claude/
+
+# playwright
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/

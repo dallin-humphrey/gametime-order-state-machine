@@ -41,6 +41,8 @@ const labels: Record<OrderState, string> = {
 export function StateBadge({ state }: { state: OrderState }) {
   return (
     <span
+      role="status"
+      data-state={state}
       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${styles[state]}`}
     >
       {labels[state]}

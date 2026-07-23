@@ -110,4 +110,16 @@
 - Typecheck + 69 tests + `next build` all green. All 6 routes registered.
 - Manual click-through (below).
 
+## 2026-07-23 — Phase 7 Playwright e2e (added after Phase 6 because manual smoke testing was slow)
+
+**What AI helped with:**
+- Installed `@playwright/test` + chromium, wrote `playwright.config.ts` with `reuseExistingServer` + HTML reporter + explicit screenshots per spec.
+- Added `data-state` attribute to `StateBadge` so tests select on a stable contract, not fuzzy text.
+- Five specs mirroring the four required scenarios + manual resolve, each ending with a full-page screenshot of its terminal state.
+
+**How it was validated:**
+- `npm run test:e2e` — 5/5 passed on first run in 5.5s.
+- Manually opened one screenshot (needs_attention) to verify the loud red banner, both errors in metadata JSON, and the manual-resolve button all render as designed.
+- HTML report at `playwright-report/index.html` includes every screenshot inline.
+
 <!-- Add one entry per meaningful AI-assisted step from here on. -->
